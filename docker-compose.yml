@@ -1,0 +1,45 @@
+version: "3"
+
+networks:
+  backend:
+
+services:
+  php-fpm:
+    build:
+      context: ./php-fpm
+      dockerfile: Dockerfile
+    volumes:
+      - ~/Sites:/var/www
+      - ./php-fpm/php7.2.ini:/usr/local/etc/php/php.ini:ro
+    networks:
+      - backend
+    expose:
+      - "9000"
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ~/Sites:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./logs/nginx:/var/log/nignx
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - php-fpm
+    networks:
+      - backend
+    ports:
+      - "80:80"
+
+  mysql:
+    build:
+      context: ./mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./mysql/my.conf:/etc/mysql/conf.d/my.cnf
+      - ./logs/mysql:/var/log/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - backend
