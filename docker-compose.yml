@@ -1,7 +1,7 @@
 version: "3"
 
 networks:
-  backend:
+  web_network:
 
 services:
   php73-fpm:
@@ -13,7 +13,7 @@ services:
       - ${SITES_PATH}:/var/www:cached
       - ./php-fpm/php7.3.ini:/usr/local/etc/php/php.ini
     networks:
-      - backend
+      - web_network
 
   php56-fpm:
     build:
@@ -24,7 +24,7 @@ services:
       - ${SITES_PATH}:/var/www:cached
       - ./php-fpm/php5.6.ini:/usr/local/etc/php/php.ini
     networks:
-      - backend
+      - web_network
 
   nginx:
     build:
@@ -39,7 +39,7 @@ services:
       - php56-fpm
       - php73-fpm
     networks:
-      - backend
+      - web_network
     ports:
       - "80:80"
 
@@ -51,7 +51,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - backend
+      - web_network
 
   mysql-master:
     build:
@@ -64,8 +64,8 @@ services:
         - TZ=Asia/Shanghai
     volumes:
       - ./mysql/my_master.conf:/etc/mysql/conf.d/my.cnf
-      - ./logs/mysql-master:/var/log/mysql
-#      - ./data/mysql-master:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+      - ./data/mysql:/var/lib/mysql
       - ./mysql/init-master:/docker-entrypoint-initdb.d/
     command: [
       "--server-id=1",
@@ -73,7 +73,7 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - backend
+      - web_network
 
   mysql-slave:
     build:
@@ -96,4 +96,4 @@ services:
     ports:
       - "3307:3306"
     networks:
-      - backend
+      - web_network

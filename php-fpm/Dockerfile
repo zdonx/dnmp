@@ -12,13 +12,13 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 ;fi
 
 RUN chmod uga+x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions zip redis pdo_mysql bcmath mcrypt gd xdebug
+    install-php-extensions zip redis pdo_mysql bcmath mcrypt gd xdebug sockets
 
 RUN php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.php');"
 RUN php composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
 RUN mv composer.phar /usr/local/bin/composer
-RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
+RUN composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 CMD ["php-fpm"]
 
