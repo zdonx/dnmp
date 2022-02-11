@@ -43,7 +43,7 @@ services:
     depends_on:
       - php56-fpm
       - php74-fpm
-      - php81-fpm
+#      - php81-fpm
     networks:
       - network
     ports:
