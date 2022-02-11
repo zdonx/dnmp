@@ -1,45 +1,51 @@
 version: "3"
 
 networks:
-  web_network:
+  network:
 
 services:
-  php73-fpm:
+#  php81-fpm:
+#    build:
+#      context: ./php/php81
+#    volumes:
+#      - ${SITES_PATH}:/var/www/html:cached
+#      - ./php/php81/php.ini:/usr/local/etc/php/php.ini
+#    networks:
+#      - network
+
+  php74-fpm:
     build:
-      context: ./php-fpm
-      args:
-        - BASE_IMAGE_TAG_PREFIX=7.3
+      context: ./php/php74
     volumes:
-      - ${SITES_PATH}:/var/www:cached
-      - ./php-fpm/php7.3.ini:/usr/local/etc/php/php.ini
+      - ${SITES_PATH}:/var/www/html:cached
+      - ./php/php74/php.ini:/usr/local/etc/php/php.ini
     networks:
-      - web_network
+      - network
 
   php56-fpm:
     build:
-      context: ./php-fpm
-      args:
-        - BASE_IMAGE_TAG_PREFIX=5.6
+      context: ./php/php56
     volumes:
-      - ${SITES_PATH}:/var/www:cached
-      - ./php-fpm/php5.6.ini:/usr/local/etc/php/php.ini
+      - ${SITES_PATH}:/var/www/html:cached
+      - ./php/php56/php.ini:/usr/local/etc/php/php.ini
     networks:
-      - web_network
+      - network
 
   nginx:
     build:
       context: ./nginx
     volumes:
-      - ${SITES_PATH}:/var/www:cached
+      - ${SITES_PATH}:/var/www/html:cached
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/sites:/etc/nginx/sites-available
       - ./logs/nginx:/var/log/nignx
       - ./ssl:/etc/nginx/ssl
     depends_on:
       - php56-fpm
-      - php73-fpm
+      - php74-fpm
+      - php81-fpm
     networks:
-      - web_network
+      - network
     ports:
       - "80:80"
 
@@ -51,49 +57,46 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - web_network
+      - network
 
-  mysql-master:
-    build:
-      context: ./mysql
-      args:
-        - MYSQL_VERSION=${MYSQL_VERSION}
-        - MYSQL_EXPOSE=3306
-    environment:
-        - MYSQL_ROOT_PASSWORD=root
-        - TZ=Asia/Shanghai
-    volumes:
-      - ./mysql/my_master.conf:/etc/mysql/conf.d/my.cnf
-      - ./logs/mysql:/var/log/mysql
-      - ./data/mysql:/var/lib/mysql
-      - ./mysql/init-master:/docker-entrypoint-initdb.d/
-    command: [
-      "--server-id=1",
-    ]
-    ports:
-      - "3306:3306"
-    networks:
-      - web_network
+  # mysql:
+  #   build:
+  #     context: ./mysql/8.0
+  #   environment:
+  #       - MYSQL_ROOT_PASSWORD=root
+  #       - MYSQL_ROOT_HOST=%
+  #   volumes:
+  #     - ./mysql/8.0/my.cnf:/etc/my.cnf
+  #     - ./logs/mysql:/var/log/mysql
+  #     - ./data/mysql:/var/lib/mysql
+  #     - ./mysql/8.0/init.sql:/docker-entrypoint-initdb.d/init.sql
+  #   command: [
+  #     "--server-id=1",
+  #   ]
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - network
 
-  mysql-slave:
-    build:
-      context: ./mysql
-      args:
-        - MYSQL_VERSION=${MYSQL_VERSION}
-        - MYSQL_EXPOSE=3307
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./mysql/my_slave.conf:/etc/mysql/conf.d/my.cnf
-      - ./logs/mysql-slave:/var/log/mysql
-#      - ./data/mysql-slave:/var/lib/mysql
-    depends_on:
-      - mysql-master
-    command: [
-      "--server-id=2",
-    ]
-    ports:
-      - "3307:3306"
-    networks:
-      - web_network
+#  mysql-slave:
+#    build:
+#      context: ./mysql
+#      args:
+#        - MYSQL_VERSION=${MYSQL_VERSION}
+#        - MYSQL_EXPOSE=3307
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#      - TZ=Asia/Shanghai
+#    volumes:
+#      - ./mysql/my_slave.conf:/etc/mysql/conf.d/my.cnf
+#      - ./logs/mysql-slave:/var/log/mysql
+##      - ./data/mysql-slave:/var/lib/mysql
+#    depends_on:
+#      - mysql-master
+#    command: [
+#      "--server-id=2",
+#    ]
+#    ports:
+#      - "3307:3306"
+#    networks:
+#      - network

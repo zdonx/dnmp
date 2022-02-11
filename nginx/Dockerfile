@@ -22,7 +22,8 @@ RUN apk add --no-cache curl
 
 # Set upstream conf and remove the default conf
 RUN echo "upstream php56-upstream { server php56-fpm:9000; }" > /etc/nginx/conf.d/php56-upstream.conf \
-    && echo "upstream php73-upstream { server php73-fpm:9000; }" > /etc/nginx/conf.d/php73-upstream.conf \
+    && echo "upstream php73-upstream { server php74-fpm:9000; }" > /etc/nginx/conf.d/php73-upstream.conf \
+    && echo "upstream php81-upstream { server php81-fpm:9000; }" > /etc/nginx/conf.d/php81-upstream.conf \
     && rm /etc/nginx/conf.d/default.conf
 
 EXPOSE 80 81 443
