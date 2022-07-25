@@ -11,7 +11,7 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 ;fi
 
 RUN chmod uga+x /usr/local/bin/install-php-extensions && sync && \
-    install-php-extensions @composer zip redis pdo_mysql bcmath mcrypt gd xdebug sockets
+    install-php-extensions openssl @composer zip redis pdo_mysql bcmath mcrypt gd xdebug sockets
 
 CMD ["php-fpm"]
 
